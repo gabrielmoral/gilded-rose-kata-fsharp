@@ -23,6 +23,8 @@ let decreaseQualityBy quality item =
     if exceededMinQuality then { item with Quality = minQuality }
     else { item with Quality = item.Quality - quality }
 
+let noQuality item = { item with Quality = 0 }
+
 let (|After|_|) x = if x = 0 then Some After else None
 let (|Before|_|) x = if x <= 5 then Some Before else None  
 let (|LongBefore|_|) x = if x <= 10 then Some LongBefore else None  
@@ -32,7 +34,7 @@ let calculateQuality item =
     | Some AgedBrie -> increaseQualityBy 1
     | Some BackStagePass -> 
         match item.SellIn with
-        | After -> decreaseQualityBy item.Quality
+        | After -> noQuality
         | Before -> increaseQualityBy 3
         | LongBefore -> increaseQualityBy 2
         | _ -> increaseQualityBy 1

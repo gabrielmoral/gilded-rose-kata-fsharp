@@ -25,26 +25,23 @@ let decreaseQualityBy quality item =
 
 let calculateQuality item = 
     match item.Type with
-    | Some AgedBrie -> item |> increaseQualityBy 1
+    | Some AgedBrie -> increaseQualityBy 1
     | Some BackStagePass -> 
         match item.SellIn with
-        | x when x = 0 -> item |> decreaseQualityBy item.Quality
-        | x when x <= 5 -> item |> increaseQualityBy 3
-        | x when x <= 10 -> item |> increaseQualityBy 2
-        | _ -> item |> increaseQualityBy 1
+        | x when x = 0 -> decreaseQualityBy item.Quality
+        | x when x <= 5 -> increaseQualityBy 3
+        | x when x <= 10 -> increaseQualityBy 2
+        | _ -> increaseQualityBy 1
     | _ ->
         match item.SellIn with
-        | 0 -> item |> decreaseQualityBy 2
-        | _ -> item |> decreaseQualityBy 1
+        | 0 -> decreaseQualityBy 2
+        | _ -> decreaseQualityBy 1
 
 let decreaseDate item = { item with SellIn = item.SellIn - 1 }
 
-let endDayBackStagePasses = calculateQuality >> decreaseDate
-
-let chooseProccessor item =
-    match item.Type with
-    | Some Sulfuras -> id
-    | _ -> calculateQuality >> decreaseDate
-
 let processItem item =
-    item |> chooseProccessor item
+    let processor = match item.Type with
+                    | Some Sulfuras -> id
+                    | _ -> decreaseDate >> calculateQuality item
+    
+    item |> processor

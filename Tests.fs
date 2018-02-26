@@ -64,3 +64,9 @@ let ``"Backstage passes" quality drops to 0 after the concert`` () =
     let noQuality = processItem { SellIn = 0; Quality = 10; Type = Some BackStagePass}
 
     Assert.Equal(0, noQuality.Quality)
+
+[<Fact>]
+let ``"Conjured" items degrade in Quality twice as fast as normal items`` () =
+    let degradedTwice = processItem { SellIn = 10; Quality = 10; Type = Some Conjured}
+
+    Assert.Equal(8, degradedTwice.Quality)

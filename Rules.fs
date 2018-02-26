@@ -46,15 +46,23 @@ let calculateItemQuality item =
                      | _ -> decreaseQualityBy 1
     item |> calculator
 
+let calculateConjuredQuality item =
+    item |> decreaseQualityBy 2
+
 let decreaseDate item = 
     if item.SellIn = 0 then item
     else { item with SellIn = item.SellIn - 1 }
 
 let processItem item =
-    let processor = match item.Type with
-                    | Some Sulfuras -> id
-                    | Some AgedBrie -> decreaseDate >> agedBrieQuality
-                    | Some BackStagePass -> decreaseDate >> backStagePassQuality
-                    | None -> decreaseDate >> calculateItemQuality
+    let qualityCalculator = match item.Type with
+                            | Some Sulfuras -> id
+                            | Some AgedBrie -> agedBrieQuality
+                            | Some BackStagePass -> backStagePassQuality
+                            | Some Conjured -> calculateConjuredQuality
+                            | None -> calculateItemQuality
+
+    let sellInCalculator = match item.Type with
+                            | Some Sulfuras -> id
+                            | _ -> decreaseDate
     
-    item |> processor
+    item |> (sellInCalculator >> qualityCalculator)

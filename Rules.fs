@@ -4,7 +4,9 @@ type Quality = Quality of int with
     static member (+) (Quality q, Quality q') = Quality (q + q')
     static member (-) (Quality q, Quality q') = Quality (q - q')
 
-type SellIn = int
+type SellIn = SellIn of int with
+    static member (-) (SellIn s, SellIn s') = SellIn (s - s')
+
 
 type Type = AgedBrie | Sulfuras | BackStagePass | Conjured
 
@@ -28,9 +30,9 @@ let decreaseQualityBy quality item =
 
 let noQuality item = { item with Quality = Quality 0 }
 
-let (|AfterSellIn|_|) x = if x = 0 then Some AfterSellIn else None
-let (|BeforeSellIn|_|) x = if x <= 5 then Some BeforeSellIn else None  
-let (|LongBeforeSellIn|_|) x = if x <= 10 then Some LongBeforeSellIn else None
+let (|AfterSellIn|_|) x = if x = SellIn 0 then Some AfterSellIn else None
+let (|BeforeSellIn|_|) x = if x <= SellIn 5 then Some BeforeSellIn else None  
+let (|LongBeforeSellIn|_|) x = if x <= SellIn 10 then Some LongBeforeSellIn else None
 
 let agedBrieQuality item =
     item |> increaseQualityBy (Quality 1)
@@ -53,8 +55,8 @@ let calculateConjuredQuality item =
     item |> decreaseQualityBy (Quality 2)
 
 let decreaseDate item = 
-    if item.SellIn = 0 then item
-    else { item with SellIn = item.SellIn - 1 }
+    if item.SellIn = SellIn 0 then item
+    else { item with SellIn = item.SellIn - SellIn 1 }
 
 let processItem item =
     let qualityCalculator = match item.Type with

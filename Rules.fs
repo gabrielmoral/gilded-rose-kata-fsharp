@@ -1,6 +1,9 @@
 module Rules
 
-type Quality = int
+type Quality = Quality of int with
+    static member (+) (Quality q, Quality q') = Quality (q + q')
+    static member (-) (Quality q, Quality q') = Quality (q - q')
+
 type SellIn = int
 
 type Type = AgedBrie | Sulfuras | BackStagePass | Conjured
@@ -12,42 +15,42 @@ type Item = {
 }
 
 let increaseQualityBy quality item = 
-    let maxQuality = 50
+    let maxQuality = Quality 50
     let exceededMaxQuality = item.Quality + quality >= maxQuality
     if exceededMaxQuality then { item with Quality = maxQuality }
     else { item with Quality = item.Quality + quality }
 
 let decreaseQualityBy quality item =
-    let minQuality = 0
+    let minQuality = Quality 0
     let exceededMinQuality = item.Quality - quality <= minQuality
     if exceededMinQuality then { item with Quality = minQuality }
     else { item with Quality = item.Quality - quality }
 
-let noQuality item = { item with Quality = 0 }
+let noQuality item = { item with Quality = Quality 0 }
 
 let (|AfterSellIn|_|) x = if x = 0 then Some AfterSellIn else None
 let (|BeforeSellIn|_|) x = if x <= 5 then Some BeforeSellIn else None  
 let (|LongBeforeSellIn|_|) x = if x <= 10 then Some LongBeforeSellIn else None
 
 let agedBrieQuality item =
-    item |> increaseQualityBy 1
+    item |> increaseQualityBy (Quality 1)
 
 let backStagePassQuality item =
     let calculator = match item.SellIn with
                      | AfterSellIn -> noQuality
-                     | BeforeSellIn -> increaseQualityBy 3
-                     | LongBeforeSellIn -> increaseQualityBy 2
-                     | _ -> increaseQualityBy 1
+                     | BeforeSellIn -> increaseQualityBy (Quality 3)
+                     | LongBeforeSellIn -> increaseQualityBy (Quality 2)
+                     | _ -> increaseQualityBy (Quality 1)
     item |> calculator
 
 let calculateItemQuality item =
     let calculator = match item.SellIn with
-                     | AfterSellIn -> decreaseQualityBy 2
-                     | _ -> decreaseQualityBy 1
+                     | AfterSellIn -> decreaseQualityBy (Quality 2)
+                     | _ -> decreaseQualityBy (Quality 1)
     item |> calculator
 
 let calculateConjuredQuality item =
-    item |> decreaseQualityBy 2
+    item |> decreaseQualityBy (Quality 2)
 
 let decreaseDate item = 
     if item.SellIn = 0 then item

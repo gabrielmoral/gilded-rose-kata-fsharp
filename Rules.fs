@@ -6,7 +6,7 @@ type Quality = Quality of int with
 
 type SellIn = SellIn of int with
     static member (-) (SellIn s, SellIn s') = SellIn (s - s')
-
+    
 
 type Type = AgedBrie | Sulfuras | BackStagePass | Conjured
 
@@ -45,13 +45,13 @@ let backStagePassQuality item =
                      | _ -> increaseQualityBy (Quality 1)
     item |> calculator
 
-let calculateItemQuality item =
+let genericQuality item =
     let calculator = match item.SellIn with
                      | AfterSellIn -> decreaseQualityBy (Quality 2)
                      | _ -> decreaseQualityBy (Quality 1)
     item |> calculator
 
-let calculateConjuredQuality item =
+let conjuredQuality item =
     item |> decreaseQualityBy (Quality 2)
 
 let decreaseDate item = 
@@ -63,8 +63,8 @@ let processItem item =
                             | Some Sulfuras -> id
                             | Some AgedBrie -> agedBrieQuality
                             | Some BackStagePass -> backStagePassQuality
-                            | Some Conjured -> calculateConjuredQuality
-                            | None -> calculateItemQuality
+                            | Some Conjured -> conjuredQuality
+                            | None -> genericQuality
 
     let sellInCalculator = match item.Type with
                             | Some Sulfuras -> id

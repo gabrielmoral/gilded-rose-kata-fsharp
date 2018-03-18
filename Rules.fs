@@ -8,12 +8,12 @@ type SellIn = SellIn of int with
     static member (-) (SellIn s, SellIn s') = SellIn (s - s')
     
 
-type Type = AgedBrie | Sulfuras | BackStagePass | Conjured
+type Type = AgedBrie | Sulfuras | BackStagePass | Conjured | Generic
 
 type Item = {
     SellIn : SellIn
     Quality : Quality
-    Type : Type option
+    Type : Type
 }
 
 let increaseQualityBy quality item = 
@@ -60,14 +60,14 @@ let decreaseDate item =
 
 let processItem item =
     let qualityCalculator = match item.Type with
-                            | Some Sulfuras -> id
-                            | Some AgedBrie -> agedBrieQuality
-                            | Some BackStagePass -> backStagePassQuality
-                            | Some Conjured -> conjuredQuality
-                            | None -> genericQuality
+                            | Sulfuras -> id
+                            | AgedBrie -> agedBrieQuality
+                            | BackStagePass -> backStagePassQuality
+                            | Conjured -> conjuredQuality
+                            | Generic -> genericQuality
 
     let sellInCalculator = match item.Type with
-                            | Some Sulfuras -> id
+                            | Sulfuras -> id
                             | _ -> decreaseDate
     
     item |> (sellInCalculator >> qualityCalculator)
